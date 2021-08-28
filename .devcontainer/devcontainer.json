@@ -1,0 +1,74 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.191.1/containers/go
+{
+	"name": "Go",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			// Update the VARIANT arg to pick a version of Go: 1, 1.16, 1.15
+			"VARIANT": "1.16",
+			// Options
+			"NODE_VERSION": "lts/*"
+		}
+	},
+	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"[go]": {
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": true,
+			},
+			// Optional: Disable snippets, as they conflict with completion ranking.
+			"editor.snippetSuggestions": "none",
+		},
+		"files.trimTrailingWhitespace": true,
+		"go.toolsManagement.checkForUpdates": "local",
+		"go.useLanguageServer": true,
+		"go.gopath": "/go",
+		"go.goroot": "/usr/local/go"
+		// Global settings for gopls
+		// https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+		"gopls": {
+			// === Officially supported Settings ===
+
+			// This controls the information that appears in the hover text.
+			"hoverKind": "SynopsisDocumentation",
+			// If true, then completion responses may contain placeholders for function parameters or struct fields.
+			"usePlaceholders": true,
+			// This controls where points documentation for given package in `textDocument/documentLink`.
+			"linkTarget": "pkg.go.dev",
+
+			// === Experimental Settings ===
+
+			// If true, it enables the use of the staticcheck.io analyzers.
+			// Warning: This will significantly increase memory usage.
+			"staticcheck": false,
+			// If false, indicates that the user does not want documentation with completion results.
+			"completionDocumentation": true,
+			// If true, the completion engine is allowed to make suggestions for packages that you do not currently import.
+			"completeUnimported": true,
+			// If true, this turns on the ability to return completions from deep inside relevant entities, rather than just the locally accessible ones.
+			"deepCompletion": true
+		}
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"golang.Go",
+		"shardulm94.trailing-spaces",
+		"christian-kohler.path-intellisense",
+		"CoenraadS.bracket-pair-colorizer",
+		"mhutchie.git-graph"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "go version",
+
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}
