@@ -7,6 +7,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+const (
+	anyPrice = "any price"
+)
+
 func TestKabuka_Fetch(t *testing.T) {
 	type fields struct {
 		Option Option
@@ -26,7 +30,7 @@ func TestKabuka_Fetch(t *testing.T) {
 			},
 			want: &Stock{
 				Symbol:       "3994.T",
-				CurrentPrice: "any price",
+				CurrentPrice: anyPrice,
 			},
 		},
 		{
@@ -38,7 +42,7 @@ func TestKabuka_Fetch(t *testing.T) {
 			},
 			want: &Stock{
 				Symbol:       "4373.T",
-				CurrentPrice: "any price",
+				CurrentPrice: anyPrice,
 			},
 		},
 		{
@@ -50,21 +54,25 @@ func TestKabuka_Fetch(t *testing.T) {
 			},
 			want: &Stock{
 				Symbol:       "AAPL",
-				CurrentPrice: "any price",
+				CurrentPrice: anyPrice,
 			},
 		},
 	}
 	opts := []cmp.Option{
-		cmp.Comparer(func(want *Stock, got *Stock) bool {
-			if want.Symbol != got.Symbol {
+		cmp.Comparer(func(a *Stock, b *Stock) bool {
+			if a.Symbol != b.Symbol {
 				return false
 			}
-			if want.CurrentPrice == "" {
-				return true // ignore Price
+			if a.CurrentPrice == anyPrice {
+				// success if any float number
+				_, err := strconv.ParseFloat(b.CurrentPrice, 32)
+				return err == nil
+			} else if b.CurrentPrice == anyPrice {
+				// success if any float number
+				_, err := strconv.ParseFloat(a.CurrentPrice, 32)
+				return err == nil
 			}
-			// success if any float number
-			_, err := strconv.ParseFloat(got.CurrentPrice, 32)
-			return err != nil
+			return false
 		}),
 	}
 	for _, tt := range tests {

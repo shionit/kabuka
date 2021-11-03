@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Printf("%s kabuka is %s\n", result.Symbol, result.CurrentPrice)
+		fmt.Printf("%s\t%s\n", result.CurrentPrice, result.Symbol)
 	},
 }
 
