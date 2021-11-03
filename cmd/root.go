@@ -23,22 +23,32 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+
+	"github.com/shionit/kabuka/internal/app/kabuka"
+
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kabuka",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Show stock information",
+	Args:  cobra.MinimumNArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("kabuka is here.")
+		symbol := cmd.Flags().Arg(0) // Ticker like "3994.T"
+
+		kabuka := &kabuka.Kabuka{
+			Option: kabuka.Option{
+				Symbol: symbol,
+			},
+		}
+		result, err := kabuka.Fetch()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Printf("%s kabuka is %s\n", result.Symbol, result.CurrentPrice)
 	},
 }
 
@@ -50,5 +60,5 @@ func Execute() {
 
 func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kabuka.yaml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
