@@ -3,6 +3,7 @@ package kabuka
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"golang.org/x/xerrors"
@@ -35,6 +36,8 @@ func (k *Kabuka) Fetch() (*Stock, error) {
 		return nil, xerrors.Errorf("Http client Get status code error: %d %s, err: %w",
 			res.StatusCode, res.Status, err)
 	}
+	paths := strings.Split(res.Request.URL.Path, "/")
+	symbol := paths[len(paths)-1]
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
@@ -43,7 +46,7 @@ func (k *Kabuka) Fetch() (*Stock, error) {
 	curPrice := doc.Find(selectorCurrentPrice).Text()
 
 	return &Stock{
-		Symbol:       k.Symbol,
+		Symbol:       symbol,
 		CurrentPrice: curPrice,
 	}, nil
 }

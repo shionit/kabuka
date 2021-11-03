@@ -32,7 +32,7 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "kabuka",
+	Use:   "kabuka [symbol]",
 	Short: "Show stock information",
 	Args:  cobra.MinimumNArgs(1),
 
