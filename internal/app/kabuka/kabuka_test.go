@@ -15,6 +15,10 @@ func TestKabuka_Fetch(t *testing.T) {
 	type fields struct {
 		Option Option
 	}
+	type testStock struct {
+		*Stock
+		isWant bool
+	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -59,20 +63,25 @@ func TestKabuka_Fetch(t *testing.T) {
 		},
 	}
 	opts := []cmp.Option{
-		cmp.Comparer(func(a *Stock, b *Stock) bool {
+		cmp.Comparer(func(a *testStock, b *testStock) bool {
 			if a.Symbol != b.Symbol {
 				return false
 			}
-			if a.CurrentPrice == anyPrice {
+			var want, got *testStock
+			if a.isWant {
+				want, got = a, b
+			} else {
+				want, got = b, a
+			}
+			if want.CurrentPrice == anyPrice {
+				if got.CurrentPrice == "---" {
+					return true // when market is closed
+				}
 				// success if any float number
-				_, err := strconv.ParseFloat(b.CurrentPrice, 32)
-				return err == nil
-			} else if b.CurrentPrice == anyPrice {
-				// success if any float number
-				_, err := strconv.ParseFloat(a.CurrentPrice, 32)
+				_, err := strconv.ParseFloat(got.CurrentPrice, 32)
 				return err == nil
 			}
-			return false
+			return want.CurrentPrice == got.CurrentPrice
 		}),
 	}
 	for _, tt := range tests {
@@ -85,7 +94,11 @@ func TestKabuka_Fetch(t *testing.T) {
 				t.Errorf("Fetch() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if diff := cmp.Diff(tt.want, got, opts...); diff != "" {
+			want := &testStock{
+				tt.want,
+				true,
+			}
+			if diff := cmp.Diff(want, &testStock{got, false}, opts...); diff != "" {
 				t.Errorf("Fetch() diff(-want +got): %v", diff)
 			}
 		})
