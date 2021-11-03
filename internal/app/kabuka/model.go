@@ -18,3 +18,11 @@ type Stock struct {
 	Symbol       string
 	CurrentPrice string
 }
+
+type marketType int
+
+const (
+	unknown marketType = iota
+	jp
+	us
+)

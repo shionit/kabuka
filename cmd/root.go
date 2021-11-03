@@ -32,7 +32,7 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "kabuka",
+	Use:   "kabuka [symbol]",
 	Short: "Show stock information",
 	Args:  cobra.MinimumNArgs(1),
 
@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Printf("%s kabuka is %s\n", result.Symbol, result.CurrentPrice)
+		fmt.Printf("%s\t%s\n", result.CurrentPrice, result.Symbol)
 	},
 }
 
