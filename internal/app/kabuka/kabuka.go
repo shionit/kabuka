@@ -46,6 +46,9 @@ func (k *Kabuka) Fetch() (*Stock, error) {
 		return nil, xerrors.Errorf("Http client Get status code error: %d %s, err: %w",
 			res.StatusCode, res.Status, err)
 	}
+	if isSymbolNotFound(res) {
+		return nil, xerrors.New("Symbol is not found.")
+	}
 	market, err := parseMarketType(res)
 	if err != nil {
 		return nil, err
@@ -70,6 +73,12 @@ func (k *Kabuka) Fetch() (*Stock, error) {
 		Symbol:       symbol,
 		CurrentPrice: formatPrice(curPrice),
 	}, nil
+}
+
+func isSymbolNotFound(res *http.Response) bool {
+	url := res.Request.URL.String()
+	// If location is back to search page, result is "not found".
+	return strings.HasPrefix(url, financeSiteUrl)
 }
 
 func parseMarketType(res *http.Response) (marketType, error) {

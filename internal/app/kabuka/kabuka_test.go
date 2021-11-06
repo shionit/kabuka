@@ -61,6 +61,15 @@ func TestKabuka_Fetch(t *testing.T) {
 				CurrentPrice: anyPrice,
 			},
 		},
+		{
+			name: "if kabuka WRONG999 then error.",
+			fields: fields{
+				Option: Option{
+					Symbol: "WRONG999",
+				},
+			},
+			wantErr: true,
+		},
 	}
 	opts := []cmp.Option{
 		cmp.Comparer(func(a *testStock, b *testStock) bool {
@@ -92,6 +101,9 @@ func TestKabuka_Fetch(t *testing.T) {
 			got, err := k.Fetch()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Fetch() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err != nil {
 				return
 			}
 			want := &testStock{
