@@ -1,6 +1,7 @@
 package kabuka
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/goccy/go-json"
 	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
 	"github.com/shionit/kabuka/internal/app/kabuka/model"
 )
@@ -17,8 +19,21 @@ const (
 	financeSiteUrl = "https://info.finance.yahoo.co.jp/search/?query="
 )
 
+func (k *Kabuka) Execute() error {
+	result, err := k.fetch()
+	if err != nil {
+		return err
+	}
+	output, err := k.formatOutput(result)
+	if err != nil {
+		return err
+	}
+	fmt.Println(output)
+	return nil
+}
+
 // Fetch stock information from finance website.
-func (k *Kabuka) Fetch() (*model.Stock, error) {
+func (k *Kabuka) fetch() (*model.Stock, error) {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -57,4 +72,23 @@ func isSymbolNotFound(res *http.Response) bool {
 	url := res.Request.URL.String()
 	// If location is back to search page, result is "not found".
 	return strings.HasPrefix(url, financeSiteUrl)
+}
+
+// formatOutput format output string.
+func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
+	var result string
+
+	switch k.Option.Format {
+	case OutputFormatTypeText:
+		result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
+	case OutputFormatTypeJson:
+		b, err := json.Marshal(stock)
+		if err != nil {
+			return "", xerrors.Errorf("json Marshal failed, err: %w", err)
+		}
+		result = string(b)
+	default:
+		return "", xerrors.New("Unknown formatOutput format.")
+	}
+	return result, nil
 }

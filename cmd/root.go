@@ -22,7 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/shionit/kabuka/internal/app/kabuka"
@@ -32,6 +31,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	format string
+)
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kabuka [symbol]",
@@ -39,18 +42,21 @@ var rootCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {
-		symbol := cmd.Flags().Arg(0) // Ticker like "3994.T"
-
-		kabuka := &kabuka.Kabuka{
-			Option: kabuka.Option{
-				Symbol: symbol,
-			},
-		}
-		result, err := kabuka.Fetch()
+		f, err := kabuka.ParseOutputFormat(format)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Printf("%s\t%s\n", result.CurrentPrice, result.Symbol)
+		options := kabuka.Option{
+			Symbol: cmd.Flags().Arg(0), // Ticker like "3994.T"
+			Format: f,
+		}
+		kabuka := &kabuka.Kabuka{
+			Option: options,
+		}
+		err = kabuka.Execute()
+		if err != nil {
+			log.Fatalln(err)
+		}
 	},
 }
 
@@ -62,5 +68,6 @@ func Execute() {
 
 func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kabuka.yaml)")
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text",
+		"Output format. text or json")
 }
