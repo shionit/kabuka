@@ -21,6 +21,15 @@ $ kabuka AAPL
 150.02	AAPL
 ```
 
+kabuka supports json format. 
+```shell
+$ kabuka 3994.T -f=json
+{"symbol":"3994.T","current_price":"8420"}
+
+## same as
+$ kabuka AAPL --format=json
+```
+
 ## Dependency
 
 kabuka command depends on Yahoo! Japan Finance website.
