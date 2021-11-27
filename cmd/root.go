@@ -26,6 +26,8 @@ import (
 	"log"
 
 	"github.com/shionit/kabuka/internal/app/kabuka"
+	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
+	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
 
 	"github.com/spf13/cobra"
 )

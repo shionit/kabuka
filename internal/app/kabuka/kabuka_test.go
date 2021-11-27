@@ -4,6 +4,10 @@ import (
 	"strconv"
 	"testing"
 
+	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
+	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
+	"github.com/shionit/kabuka/internal/app/kabuka/model"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -16,13 +20,13 @@ func TestKabuka_Fetch(t *testing.T) {
 		Option Option
 	}
 	type testStock struct {
-		*Stock
+		*model.Stock
 		isWant bool
 	}
 	tests := []struct {
 		name    string
 		fields  fields
-		want    *Stock
+		want    *model.Stock
 		wantErr bool
 	}{
 		{
@@ -32,7 +36,7 @@ func TestKabuka_Fetch(t *testing.T) {
 					Symbol: "3994.T",
 				},
 			},
-			want: &Stock{
+			want: &model.Stock{
 				Symbol:       "3994.T",
 				CurrentPrice: anyPrice,
 			},
@@ -44,7 +48,7 @@ func TestKabuka_Fetch(t *testing.T) {
 					Symbol: "4373",
 				},
 			},
-			want: &Stock{
+			want: &model.Stock{
 				Symbol:       "4373.T",
 				CurrentPrice: anyPrice,
 			},
@@ -56,7 +60,7 @@ func TestKabuka_Fetch(t *testing.T) {
 					Symbol: "AAPL",
 				},
 			},
-			want: &Stock{
+			want: &model.Stock{
 				Symbol:       "AAPL",
 				CurrentPrice: anyPrice,
 			},
