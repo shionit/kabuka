@@ -1,7 +1,6 @@
 package jp
 
 import (
-	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -25,7 +24,6 @@ type jpFetcher struct {
 }
 
 func (f *jpFetcher) IsMarketUrl(url string) bool {
-	log.Printf("jpFetcher isMarketUrl: %s\n", url)
 	return strings.HasPrefix(url, financeSiteJpStockPrefix)
 }
 
