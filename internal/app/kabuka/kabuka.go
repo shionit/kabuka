@@ -10,6 +10,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gocarina/gocsv"
 	"github.com/goccy/go-json"
 	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
 	"github.com/shionit/kabuka/internal/app/kabuka/model"
@@ -32,7 +33,7 @@ func (k *Kabuka) Execute() error {
 	return nil
 }
 
-// Fetch stock information from finance website.
+// fetch stock information from finance website.
 func (k *Kabuka) fetch() (*model.Stock, error) {
 	client := http.Client{
 		Timeout: 10 * time.Second,
@@ -87,6 +88,13 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 			return "", xerrors.Errorf("json Marshal failed, err: %w", err)
 		}
 		result = string(b)
+	case OutputFormatTypeCsv:
+		stocks := []*model.Stock{stock}
+		csvContent, err := gocsv.MarshalString(&stocks)
+		if err != nil {
+			return "", xerrors.Errorf("csv Marshal failed, err: %w", err)
+		}
+		result = csvContent
 	default:
 		return "", xerrors.New("Unknown formatOutput format.")
 	}

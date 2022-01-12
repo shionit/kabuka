@@ -21,13 +21,22 @@ $ kabuka AAPL
 150.02	AAPL
 ```
 
-kabuka supports json format. 
+kabuka supports json format.
 ```shell
 $ kabuka 3994.T -f=json
 {"symbol":"3994.T","current_price":"8420"}
 
 ## same as
-$ kabuka AAPL --format=json
+$ kabuka 3994.T --format=json
+```
+and also supports csv format.
+```shell
+$ kabuka 3994.T -f=csv
+symbol,current_price
+3994.T,5850
+
+## same as
+$ kabuka 3994.T --format=csv
 ```
 
 ## Dependency

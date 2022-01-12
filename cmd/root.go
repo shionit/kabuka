@@ -69,5 +69,5 @@ func Execute() {
 func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kabuka.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text",
-		"Output format. text or json")
+		"Output format. text or json or csv")
 }
