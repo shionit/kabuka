@@ -6,7 +6,7 @@ import "golang.org/x/xerrors"
 type Option struct {
 	Symbol string
 	//ShowDetail        bool
-	Format OutputFormatType // console(default) or json
+	Format OutputFormatType // text(default) or json
 	//OutputColumnsType string // default, all, individual
 	//OutputColumns     []string
 }
