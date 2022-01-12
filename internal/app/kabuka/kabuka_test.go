@@ -166,6 +166,21 @@ func TestKabuka_formatOutput(t *testing.T) {
 			},
 			want: "{\"symbol\":\"3994.T\",\"current_price\":\"123.45\"}",
 		},
+		{
+			name: "nomal csv",
+			fields: fields{
+				Option: Option{
+					Format: OutputFormatTypeCsv,
+				},
+			},
+			args: args{
+				stock: &model.Stock{
+					Symbol:       "3994.T",
+					CurrentPrice: "1234.56",
+				},
+			},
+			want: "symbol,current_price\n3994.T,1234.56\n",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

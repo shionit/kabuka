@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/gocarina/gocsv v0.0.0-20211203214250-4735fba0c1d9
 	github.com/goccy/go-json v0.7.10
 	github.com/google/go-cmp v0.5.5
 	github.com/spf13/cobra v1.2.1
