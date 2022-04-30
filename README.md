@@ -1,6 +1,8 @@
 # kabuka
 
-[![Go](https://github.com/shionit/kabuka/actions/workflows/go.yml/badge.svg)](https://github.com/shionit/kabuka/actions/workflows/go.yml)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Go test](https://github.com/shionit/kabuka/actions/workflows/go.yml/badge.svg)](https://github.com/shionit/kabuka/actions/workflows/go.yml)
+[![reviewdog](https://github.com/shionit/kabuka/workflows/reviewdog/badge.svg)](https://github.com/shionit/kabuka/actions?query=workflow%3Areviewdog)
 
 kabuka is command line tool for display stock price.
 

@@ -12,7 +12,7 @@ import (
 const (
 	financeSiteJpStockPrefix = "https://finance.yahoo.co.jp/quote"
 
-	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN > div:nth-child(2) > section._1zZriTjI._2l2sDX5w > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
+	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN > div:nth-child(3) > section._1zZriTjI._2l2sDX5w > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
 )
 
 func init() {
