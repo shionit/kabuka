@@ -10,9 +10,11 @@ import (
 )
 
 const (
-	financeSiteJpStockPrefix = "https://finance.yahoo.co.jp/quote"
-
 	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN > div:nth-child(3) > section._1zZriTjI._2l2sDX5w > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
+)
+
+var (
+	supportMarketNamesPrefix = [...]string{"東証", "名証", "札幌", "福岡"}
 )
 
 func init() {
@@ -23,8 +25,15 @@ type jpFetcher struct {
 	fetcher.Fetcher
 }
 
-func (f *jpFetcher) IsMarketUrl(url string) bool {
-	return strings.HasPrefix(url, financeSiteJpStockPrefix)
+func (f *jpFetcher) IsMarket(doc *goquery.Document) bool {
+	marketName := fetcher.GetMarketName(doc)
+	println("marketName:" + marketName)
+	for _, prefix := range supportMarketNamesPrefix {
+		if strings.HasPrefix(marketName, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 func (f *jpFetcher) Fetch(doc *goquery.Document, symbol string) (*model.Stock, error) {
