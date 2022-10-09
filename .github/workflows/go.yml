@@ -33,4 +33,9 @@ jobs:
       run: go build -o bin/ -v ./...
 
     - name: Test
-      run: go test -v ./...
+      run: make test-coverage
+
+    - store_artifacts:
+        path: coverage
+    - store_test_results:
+        path: coverage
