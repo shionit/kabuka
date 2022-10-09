@@ -33,4 +33,10 @@ jobs:
       run: go build -o bin/ -v ./...
 
     - name: Test
-      run: go test -v ./...
+      run: make test-coverage
+
+    - name: Upload Go test coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: Go-test-coverage
+        path: coverage.html
