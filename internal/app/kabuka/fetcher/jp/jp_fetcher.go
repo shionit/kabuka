@@ -27,7 +27,6 @@ type jpFetcher struct {
 
 func (f *jpFetcher) IsMarket(doc *goquery.Document) bool {
 	marketName := fetcher.GetMarketName(doc)
-	println("marketName:" + marketName)
 	for _, prefix := range supportMarketNamesPrefix {
 		if strings.HasPrefix(marketName, prefix) {
 			return true
