@@ -31,7 +31,7 @@ func TestKabuka_fetch(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "if kabuka 3994.T then Money Forward, Inc.",
+			name: "if kabuka 3994.T @東証PRM then Money Forward, Inc.",
 			fields: fields{
 				Option: Option{
 					Symbol: "3994.T",
@@ -43,19 +43,43 @@ func TestKabuka_fetch(t *testing.T) {
 			},
 		},
 		{
-			name: "if kabuka 4373 then Simplex Holdings, Inc.",
+			name: "if kabuka 4412 @東証GRT then Science Arts, Inc.",
 			fields: fields{
 				Option: Option{
-					Symbol: "4373",
+					Symbol: "4412",
 				},
 			},
 			want: &model.Stock{
-				Symbol:       "4373.T",
+				Symbol:       "4412.T",
 				CurrentPrice: anyPrice,
 			},
 		},
 		{
-			name: "if kabuka AAPL then Apple Inc.",
+			name: "if kabuka 8604.T @東証PRM then Nomura Holdings, Inc. (IP for multi market)",
+			fields: fields{
+				Option: Option{
+					Symbol: "8604.T",
+				},
+			},
+			want: &model.Stock{
+				Symbol:       "8604.T",
+				CurrentPrice: anyPrice,
+			},
+		},
+		{
+			name: "if kabuka NMR @NYSE then Nomura Holdings, Inc. (IP for multi market)",
+			fields: fields{
+				Option: Option{
+					Symbol: "NMR",
+				},
+			},
+			want: &model.Stock{
+				Symbol:       "NMR",
+				CurrentPrice: anyPrice,
+			},
+		},
+		{
+			name: "if kabuka AAPL @NASDAQ then Apple Inc.",
 			fields: fields{
 				Option: Option{
 					Symbol: "AAPL",

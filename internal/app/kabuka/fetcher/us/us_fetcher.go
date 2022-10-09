@@ -1,17 +1,17 @@
 package us
 
 import (
-	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
 	"github.com/shionit/kabuka/internal/app/kabuka/model"
 )
 
 const (
-	financeSiteUsStockPrefix = "https://stocks.finance.yahoo.co.jp/us/detail"
+	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN > div:nth-child(2) > section > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
+)
 
-	selectorCurrentPrice = "#main > div.stocksDtlWp > div > div.forAddPortfolio > table > tbody > tr > td:nth-child(3)"
+var (
+	supportMarketNames = [...]string{"NASDAQ", "NYSE"}
 )
 
 func init() {
@@ -22,8 +22,14 @@ type usFetcher struct {
 	fetcher.Fetcher
 }
 
-func (f *usFetcher) IsMarketUrl(url string) bool {
-	return strings.HasPrefix(url, financeSiteUsStockPrefix)
+func (f *usFetcher) IsMarket(doc *goquery.Document) bool {
+	marketName := fetcher.GetMarketName(doc)
+	for _, name := range supportMarketNames {
+		if marketName == name {
+			return true
+		}
+	}
+	return false
 }
 
 func (f *usFetcher) Fetch(doc *goquery.Document, symbol string) (*model.Stock, error) {

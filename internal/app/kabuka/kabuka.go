@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	financeSiteUrl = "https://info.finance.yahoo.co.jp/search/?query="
+	financeSiteUrl = "https://finance.yahoo.co.jp/search/?query="
 )
 
 func (k *Kabuka) Execute() error {
@@ -55,17 +55,20 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 	if isSymbolNotFound(res) {
 		return nil, xerrors.New("Symbol is not found.")
 	}
-	f := fetcher.SelectFetcher(res.Request.URL.String())
-	if f == nil {
-		return nil, xerrors.New("Unknown market type.")
-	}
-	paths := strings.Split(res.Request.URL.Path, "/")
-	symbol := paths[len(paths)-1]
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return nil, xerrors.Errorf("goquery NewDocument failed, err: %w", err)
 	}
+
+	f := fetcher.SelectFetcher(doc)
+	if f == nil {
+		return nil, xerrors.New("Unknown market type.")
+	}
+
+	paths := strings.Split(res.Request.URL.Path, "/")
+	symbol := paths[len(paths)-1]
+
 	return f.Fetch(doc, symbol)
 }
 
