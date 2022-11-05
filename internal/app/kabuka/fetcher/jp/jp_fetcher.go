@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN > div:nth-child(3) > section._1zZriTjI._2l2sDX5w > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
+	selectorCurrentPrice = "#root > main > div > div > div.XuqDlHPN div section._1zZriTjI._2l2sDX5w > div._1nb3c4wQ > header > div.nOmR5zWz > span > span > span"
 )
 
 var (
