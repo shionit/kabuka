@@ -68,6 +68,7 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 
 	paths := strings.Split(res.Request.URL.Path, "/")
 	symbol := paths[len(paths)-1]
+	symbol = SanitizeInput(symbol)
 
 	return f.Fetch(doc, symbol)
 }
