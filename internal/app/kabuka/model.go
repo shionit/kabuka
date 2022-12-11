@@ -1,6 +1,9 @@
 package kabuka
 
-import "golang.org/x/xerrors"
+import (
+	"golang.org/x/xerrors"
+	"strings"
+)
 
 // Option execution parameters
 type Option struct {
@@ -33,4 +36,10 @@ func ParseOutputFormat(s string) (OutputFormatType, error) {
 		return OutputFormatTypeCsv, nil
 	}
 	return "", xerrors.Errorf("Unsupported format: %s", s)
+}
+
+// SanitizeInput returns sanitized string
+func SanitizeInput(s string) string {
+	result := strings.Replace(s, "\n", "", -1)
+	return strings.Replace(result, "\r", "", -1)
 }

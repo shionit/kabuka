@@ -23,7 +23,6 @@ package cmd
 
 import (
 	"log"
-	"strings"
 
 	"github.com/shionit/kabuka/internal/app/kabuka"
 	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
@@ -50,7 +49,7 @@ var rootCmd = &cobra.Command{
 		// Ticker like "3994.T"
 		symbol := cmd.Flags().Arg(0)
 		options := kabuka.Option{
-			Symbol: sanitizeInput(symbol),
+			Symbol: kabuka.SanitizeInput(symbol),
 			Format: f,
 		}
 		kabuka := &kabuka.Kabuka{
@@ -73,10 +72,4 @@ func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kabuka.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text",
 		"Output format. text or json or csv")
-}
-
-// sanitizeInput returns sanitized string
-func sanitizeInput(s string) string {
-	result := strings.Replace(s, "\n", "", -1)
-	return strings.Replace(result, "\r", "", -1)
 }
