@@ -1,19 +1,25 @@
 project_name: kabuka
+before:
+  hooks:
+    - go mod tidy
+    - make version
 release:
   github:
     owner: shionit
     name: kabuka
 builds:
-- env:
-    - CGO_ENABLED=0
-  goos:
-    - linux
-    - darwin
-    - windows
-  goarch:
-    - amd64
-  main: ./cmd/kabuka
-  binary: kabuka
-archive:
-  format: tar.gz
-  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd/kabuka
+    binary: kabuka
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
+checksum:
+  name_template: 'checksums.txt'
