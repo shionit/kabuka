@@ -2,7 +2,6 @@ project_name: kabuka
 before:
   hooks:
     - go mod tidy
-    - make version
 release:
   github:
     owner: shionit
