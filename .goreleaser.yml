@@ -9,7 +9,7 @@ release:
 builds:
   - env:
       - CGO_ENABLED=0
-    main: ./cmd/kabuka
+    main: .
     binary: kabuka
     goos:
       - linux
