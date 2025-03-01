@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	selectorCurrentPrice = "#root > main > div > section > div._1nb3c4wQ > header > div.gbs7pEV2 > span > span > span"
+	selectorCurrentPrice = "#root > main > div > section > div.PriceBoardMain__1nb3 > div.PriceBoardMain__priceInformation__3YfB > div.PriceBoardMain__headerPrice__gbs7 > span > span > span"
 )
 
 var (
-	supportMarketNamesPrefix = [...]string{"東証", "名証", "札幌", "福岡"}
+	supportMarketNamesPrefix = [...]string{"東証PRM", "東証GRT", "東証STD", "名証MN", "札証", "札幌ア", "福証", "福岡Q"}
 )
 
 func init() {

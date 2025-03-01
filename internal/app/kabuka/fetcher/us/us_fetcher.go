@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	selectorCurrentPrice = "#root > main > div > section > div._1nb3c4wQ > header > div.gbs7pEV2 > span > span > span"
+	selectorCurrentPrice = "#root > main > div > section > div.PriceBoardMain__1nb3 > div.PriceBoardMain__priceInformation__3YfB > div.PriceBoardMain__headerPrice__gbs7 > span > span > span"
 )
 
 var (
