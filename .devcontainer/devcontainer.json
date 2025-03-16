@@ -5,8 +5,8 @@
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
-			// Update the VARIANT arg to pick a version of Go: 1, 1.16, 1.15
-			"VARIANT": "1.18",
+			// Update the VARIANT arg to pick a version of Go
+			"VARIANT": "1.22",
 			// Options
 			"NODE_VERSION": "lts/*"
 		}
