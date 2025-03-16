@@ -11,12 +11,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.18'  # You can adjust this to your project's Go version
+          go-version: '1.22'
 
       - name: staticcheck
         uses: reviewdog/action-staticcheck@v1
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
           reporter: github-pr-review
           # Report all results.
@@ -30,4 +30,4 @@ jobs:
           reporter: github-pr-review
           filter_mode: nofilter
           fail_level: warning
-          working-directory: .  # Specify the directory containing your Go files
+          workdir: .
