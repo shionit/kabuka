@@ -1,9 +1,8 @@
 module github.com/shionit/kabuka
 
 go 1.22
-
 require (
-	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/PuerkitoBio/goquery v1.10.2
 	github.com/gocarina/gocsv v0.0.0-20230223115542-dc4ee9de5fe2
 	github.com/goccy/go-json v0.10.5
 	github.com/google/go-cmp v0.7.0
@@ -12,8 +11,8 @@ require (
 )
 
 require (
-	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 )
