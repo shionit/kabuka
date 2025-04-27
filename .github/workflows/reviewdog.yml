@@ -13,6 +13,9 @@ jobs:
         with:
           go-version: '1.22'
 
+      - name: Install dependencies
+        run: go mod download
+
       - name: staticcheck
         uses: reviewdog/action-staticcheck@v1
         with:
@@ -30,4 +33,5 @@ jobs:
           reporter: github-pr-review
           filter_mode: nofilter
           fail_level: warning
-          workdir: .
+          workdir: "."
+          golangci_lint_flags: "--timeout=5m"
