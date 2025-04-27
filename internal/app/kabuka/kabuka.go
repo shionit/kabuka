@@ -83,7 +83,7 @@ func isSymbolNotFound(res *http.Response) bool {
 func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 	var result string
 
-	switch k.Option.Format {
+	switch k.Format {
 	case OutputFormatTypeText:
 		result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
 	case OutputFormatTypeJson:

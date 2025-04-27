@@ -1,8 +1,9 @@
 package kabuka
 
 import (
-	"golang.org/x/xerrors"
 	"strings"
+
+	"golang.org/x/xerrors"
 )
 
 // Option execution parameters
@@ -40,6 +41,6 @@ func ParseOutputFormat(s string) (OutputFormatType, error) {
 
 // SanitizeInput returns sanitized string
 func SanitizeInput(s string) string {
-	result := strings.Replace(s, "\n", "", -1)
-	return strings.Replace(result, "\r", "", -1)
+	result := strings.ReplaceAll(s, "\n", "")
+	return strings.ReplaceAll(result, "\r", "")
 }
