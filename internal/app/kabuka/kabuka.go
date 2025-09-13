@@ -52,8 +52,32 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 		return nil, xerrors.Errorf("Http client Get status code error: %d %s, err: %w",
 			res.StatusCode, res.Status, err)
 	}
-	if isSymbolNotFound(res) {
-		return nil, xerrors.New("Symbol is not found.")
+
+	// Check if we're on a search results page (multiple results)
+	if isSearchResultsPage(res) {
+		// Try to find and follow the correct product link
+		productURL, err := findProductLinkFromSearchResults(res, k.Symbol)
+		if err != nil {
+			return nil, xerrors.New("Symbol is not found.")
+		}
+
+		// Follow the product link to get the actual stock page
+		productRes, err := client.Get(productURL)
+		if err != nil {
+			return nil, xerrors.Errorf("Failed to fetch product page, err: %w", err)
+		}
+		defer func() {
+			if err := productRes.Body.Close(); err != nil {
+				log.Printf("failed to close product response body: %v\n", err)
+			}
+		}()
+
+		if productRes.StatusCode != http.StatusOK {
+			return nil, xerrors.Errorf("Product page status code error: %d %s", productRes.StatusCode, productRes.Status)
+		}
+
+		// Use the product response for further processing
+		res = productRes
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -69,14 +93,47 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 	paths := strings.Split(res.Request.URL.Path, "/")
 	symbol := paths[len(paths)-1]
 	symbol = SanitizeInput(symbol)
-
 	return f.Fetch(doc, symbol)
 }
 
-func isSymbolNotFound(res *http.Response) bool {
+// isSearchResultsPage checks if the response is a search results page (multiple results)
+func isSearchResultsPage(res *http.Response) bool {
 	url := res.Request.URL.String()
-	// If location is back to search page, result is "not found".
+	// If location is back to search page, we have multiple results
 	return strings.HasPrefix(url, financeSiteUrl)
+}
+
+// findProductLinkFromSearchResults extracts the correct product link from search results
+func findProductLinkFromSearchResults(res *http.Response, symbol string) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		return "", xerrors.Errorf("Failed to parse search results page, err: %w", err)
+	}
+
+	// Look for links in the search results that match our symbol
+	// Yahoo Finance search results typically have links with the symbol in the href
+	var productURL string
+	expectedPrefix := "https://finance.yahoo.co.jp/quote/"
+
+	// Search for links that contain the symbol in their href attribute
+	doc.Find("a").Each(func(index int, item *goquery.Selection) {
+		href, exists := item.Attr("href")
+		if !exists {
+			return
+		}
+
+		// Check if this link starts with the expected prefix and ends with the symbol
+		if href == expectedPrefix + symbol {
+			productURL = href
+			return
+		}
+	})
+
+	if productURL == "" {
+		return "", xerrors.New("No matching product link found in search results")
+	}
+
+	return productURL, nil
 }
 
 // formatOutput format output string.
