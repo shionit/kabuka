@@ -9,7 +9,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20230223115542-dc4ee9de5fe2
 	github.com/goccy/go-json v0.10.5
 	github.com/google/go-cmp v0.7.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 )
 
