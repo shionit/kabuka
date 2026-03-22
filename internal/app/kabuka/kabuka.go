@@ -35,11 +35,16 @@ func (k *Kabuka) Execute() error {
 
 // fetch stock information from finance website.
 func (k *Kabuka) fetch() (*model.Stock, error) {
-	client := http.Client{
-		Timeout: 10 * time.Second,
+	client := k.httpClient
+	if client == nil {
+		client = &http.Client{Timeout: 10 * time.Second}
+	}
+	baseURL := k.baseURL
+	if baseURL == "" {
+		baseURL = financeSiteUrl
 	}
 	// Yahoo! Finance Web scraping
-	res, err := client.Get(financeSiteUrl + k.Symbol)
+	res, err := client.Get(baseURL + k.Symbol)
 	if err != nil {
 		return nil, xerrors.Errorf("Http client Get failed, err: %w", err)
 	}
@@ -54,7 +59,7 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 	}
 
 	// Check if we're on a search results page (multiple results)
-	if isSearchResultsPage(res) {
+	if isSearchResultsPage(res, baseURL) {
 		// Try to find and follow the correct product link
 		productURL, err := findProductLinkFromSearchResults(res, k.Symbol)
 		if err != nil {
@@ -97,10 +102,10 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 }
 
 // isSearchResultsPage checks if the response is a search results page (multiple results)
-func isSearchResultsPage(res *http.Response) bool {
+func isSearchResultsPage(res *http.Response, baseURL string) bool {
 	url := res.Request.URL.String()
 	// If location is back to search page, we have multiple results
-	return strings.HasPrefix(url, financeSiteUrl)
+	return strings.HasPrefix(url, baseURL)
 }
 
 // findProductLinkFromSearchResults extracts the correct product link from search results

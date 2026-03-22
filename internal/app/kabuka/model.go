@@ -1,6 +1,7 @@
 package kabuka
 
 import (
+	"net/http"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -17,6 +18,9 @@ type Option struct {
 
 type Kabuka struct {
 	Option
+	// httpClient and baseURL can be overridden in tests
+	httpClient *http.Client
+	baseURL    string
 }
 
 type OutputFormatType string
