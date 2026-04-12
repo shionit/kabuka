@@ -14,6 +14,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+// anyPrice is a sentinel used in integration tests to indicate "any non-empty price is acceptable".
+const anyPrice = "any price"
+
 func TestKabuka_fetch(t *testing.T) {
 	type fields struct {
 		Option Option

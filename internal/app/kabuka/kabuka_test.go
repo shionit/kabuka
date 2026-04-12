@@ -69,7 +69,9 @@ func TestKabuka_fetch_unit(t *testing.T) {
 			html := tt.html
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/quote/"+tt.symbol {
-					fmt.Fprint(w, html)
+					if _, err := fmt.Fprint(w, html); err != nil {
+						t.Errorf("failed to write response: %v", err)
+					}
 				} else {
 					http.Redirect(w, r, "/quote/"+tt.symbol, http.StatusFound)
 				}
