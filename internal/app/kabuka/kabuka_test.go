@@ -1,146 +1,101 @@
 package kabuka
 
 import (
-	"strconv"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
 	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
 
 	"github.com/shionit/kabuka/internal/app/kabuka/model"
-
-	"github.com/google/go-cmp/cmp"
 )
 
-const (
-	anyPrice = "any price"
-)
+// jpStockHTML returns minimal HTML that satisfies the JP fetcher's CSS selectors.
+func jpStockHTML(marketName, price string) string {
+	return fmt.Sprintf(`<html><body>
+<div id="root"><main><div><section>
+  <div class="PriceBoardMenu__3fnA PriceBoard__menu__ISpY"><span>%s</span></div>
+  <div class="PriceBoard__main__1liM">
+    <div class="PriceBoard__priceInformation__78Tl">
+      <div class="PriceBoard__priceBlock__1PmX"><span><span><span>%s</span></span></span></div>
+    </div>
+  </div>
+</section></div></main></div>
+</body></html>`, marketName, price)
+}
 
-func TestKabuka_fetch(t *testing.T) {
-	type fields struct {
-		Option Option
-	}
-	type testStock struct {
-		*model.Stock
-		isWant bool
-	}
+// usStockHTML returns minimal HTML that satisfies the US fetcher's CSS selectors.
+func usStockHTML(marketName, price string) string {
+	return jpStockHTML(marketName, price) // identical structure, different market name
+}
+
+func TestKabuka_fetch_unit(t *testing.T) {
 	tests := []struct {
-		name    string
-		fields  fields
-		want    *model.Stock
-		wantErr bool
+		name       string
+		symbol     string
+		html       string
+		wantSymbol string
+		wantPrice  string
+		wantErr    bool
 	}{
 		{
-			name: "if kabuka 3994.T @東証PRM then Money Forward, Inc.",
-			fields: fields{
-				Option: Option{
-					Symbol: "3994.T",
-				},
-			},
-			want: &model.Stock{
-				Symbol:       "3994.T",
-				CurrentPrice: anyPrice,
-			},
+			name:       "JP stock (東証PRM)",
+			symbol:     "3994.T",
+			html:       jpStockHTML("東証PRM", "1,234.56"),
+			wantSymbol: "3994.T",
+			wantPrice:  "1234.56",
 		},
 		{
-			name: "if kabuka 4412 @東証GRT then Science Arts, Inc.",
-			fields: fields{
-				Option: Option{
-					Symbol: "4412",
-				},
-			},
-			want: &model.Stock{
-				Symbol:       "4412.T",
-				CurrentPrice: anyPrice,
-			},
+			name:       "US stock (NASDAQ)",
+			symbol:     "AAPL",
+			html:       usStockHTML("NASDAQ", "189.30"),
+			wantSymbol: "AAPL",
+			wantPrice:  "189.30",
 		},
 		{
-			name: "if kabuka 8604.T @東証PRM then Nomura Holdings, Inc. (IP for multi market)",
-			fields: fields{
-				Option: Option{
-					Symbol: "8604.T",
-				},
-			},
-			want: &model.Stock{
-				Symbol:       "8604.T",
-				CurrentPrice: anyPrice,
-			},
-		},
-		{
-			name: "if kabuka NMR @NYSE then Nomura Holdings, Inc. (IP for multi market)",
-			fields: fields{
-				Option: Option{
-					Symbol: "NMR",
-				},
-			},
-			want: &model.Stock{
-				Symbol:       "NMR",
-				CurrentPrice: anyPrice,
-			},
-		},
-		{
-			name: "if kabuka AAPL @NASDAQ then Apple Inc.",
-			fields: fields{
-				Option: Option{
-					Symbol: "AAPL",
-				},
-			},
-			want: &model.Stock{
-				Symbol:       "AAPL",
-				CurrentPrice: anyPrice,
-			},
-		},
-		{
-			name: "if kabuka WRONG999 then error.",
-			fields: fields{
-				Option: Option{
-					Symbol: "WRONG999",
-				},
-			},
+			name:    "unknown market returns error",
+			symbol:  "UNKNOWN",
+			html:    `<html><body><div id="root"></div></body></html>`,
 			wantErr: true,
 		},
 	}
-	opts := []cmp.Option{
-		cmp.Comparer(func(a *testStock, b *testStock) bool {
-			if a.Symbol != b.Symbol {
-				return false
-			}
-			var want, got *testStock
-			if a.isWant {
-				want, got = a, b
-			} else {
-				want, got = b, a
-			}
-			if want.CurrentPrice == anyPrice {
-				if got.CurrentPrice == "---" {
-					return true // when market is closed
-				}
-				// success if any float number
-				_, err := strconv.ParseFloat(got.CurrentPrice, 32)
-				return err == nil
-			}
-			return want.CurrentPrice == got.CurrentPrice
-		}),
-	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// The server mirrors Yahoo Finance: /search/?query=SYM redirects to /quote/SYM,
+			// which is what isSearchResultsPage relies on to detect non-search pages.
+			html := tt.html
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/quote/"+tt.symbol {
+					if _, err := fmt.Fprint(w, html); err != nil {
+						t.Errorf("failed to write response: %v", err)
+					}
+				} else {
+					http.Redirect(w, r, "/quote/"+tt.symbol, http.StatusFound)
+				}
+			}))
+			defer srv.Close()
+
 			k := &Kabuka{
-				Option: tt.fields.Option,
+				Option:  Option{Symbol: tt.symbol},
+				baseURL: srv.URL + "/search/?query=",
 			}
 			got, err := k.fetch()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Fetch() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("fetch() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if err != nil {
+			if tt.wantErr {
 				return
 			}
-			want := &testStock{
-				tt.want,
-				true,
+			want := &model.Stock{Symbol: tt.wantSymbol, CurrentPrice: tt.wantPrice}
+			if got.Symbol != want.Symbol {
+				t.Errorf("Symbol = %q, want %q", got.Symbol, want.Symbol)
 			}
-			if diff := cmp.Diff(want, &testStock{got, false}, opts...); diff != "" {
-				t.Errorf("Fetch() diff(-want +got): %v", diff)
+			if got.CurrentPrice != want.CurrentPrice {
+				t.Errorf("CurrentPrice = %q, want %q", got.CurrentPrice, want.CurrentPrice)
 			}
 		})
 	}
