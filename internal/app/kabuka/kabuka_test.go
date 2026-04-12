@@ -12,10 +12,6 @@ import (
 	"github.com/shionit/kabuka/internal/app/kabuka/model"
 )
 
-const (
-	anyPrice = "any price"
-)
-
 // jpStockHTML returns minimal HTML that satisfies the JP fetcher's CSS selectors.
 func jpStockHTML(marketName, price string) string {
 	return fmt.Sprintf(`<html><body>
