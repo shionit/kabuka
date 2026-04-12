@@ -11,7 +11,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.22'
+          go-version-file: go.mod
 
       - name: Install dependencies
         run: go mod download
@@ -25,6 +25,7 @@ jobs:
           # Report all results.
           filter_mode: nofilter
           fail_level: warning
+          use_go_install: true
 
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
