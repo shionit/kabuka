@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	selectorMarketNameSingle = "#root > main > div > section > div.PriceBoardMenu__3fnA.PriceBoard__menu__ISpY > span"
-	selectorMarketNameMulti  = "#root > main > div > section > div.PriceBoardMenu__3fnA.PriceBoard__menu__ISpY > div.Popup__34dI.PriceBoardMenu__popup__2i88 > button"
+	selectorMarketNameSingle = "[class*='PriceBoardMenu__label']"
+	selectorMarketNameMulti  = "[class*='PriceBoardMenu__toggle']"
 )
 
 var (
