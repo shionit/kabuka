@@ -30,8 +30,8 @@ func TestFormatPrice(t *testing.T) {
 func TestGetMarketName_single(t *testing.T) {
 	html := `<html><body>
 <div id="root"><main><div><section>
-  <div class="PriceBoardMenu__3fnA PriceBoard__menu__ISpY">
-    <span>東証PRM</span>
+  <div>
+    <span class="_PriceBoardMenu__label_92n65_18">東証PRM</span>
   </div>
 </section></div></main></div>
 </body></html>`
@@ -50,11 +50,8 @@ func TestGetMarketName_single(t *testing.T) {
 func TestGetMarketName_multi(t *testing.T) {
 	html := `<html><body>
 <div id="root"><main><div><section>
-  <div class="PriceBoardMenu__3fnA PriceBoard__menu__ISpY">
-    <span></span>
-    <div class="Popup__34dI PriceBoardMenu__popup__2i88">
-      <button>NASDAQ</button>
-    </div>
+  <div>
+    <button class="_PriceBoardMenu__toggle_92n65_18">NASDAQ<span aria-hidden="true"></span></button>
   </div>
 </section></div></main></div>
 </body></html>`
@@ -92,8 +89,8 @@ func TestSelectFetcher(t *testing.T) {
 
 	html := `<html><body>
 <div id="root"><main><div><section>
-  <div class="PriceBoardMenu__3fnA PriceBoard__menu__ISpY">
-    <span>TEST_MARKET</span>
+  <div>
+    <span class="_PriceBoardMenu__label_92n65_18">TEST_MARKET</span>
   </div>
 </section></div></main></div>
 </body></html>`

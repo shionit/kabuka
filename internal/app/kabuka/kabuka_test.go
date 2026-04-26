@@ -16,12 +16,8 @@ import (
 func jpStockHTML(marketName, price string) string {
 	return fmt.Sprintf(`<html><body>
 <div id="root"><main><div><section>
-  <div class="PriceBoardMenu__3fnA PriceBoard__menu__ISpY"><span>%s</span></div>
-  <div class="PriceBoard__main__1liM">
-    <div class="PriceBoard__priceInformation__78Tl">
-      <div class="PriceBoard__priceBlock__1PmX"><span><span><span>%s</span></span></span></div>
-    </div>
-  </div>
+  <div><span class="_PriceBoardMenu__label_92n65_18">%s</span></div>
+  <div><span class="_StyledNumber__value_1arhg_9">%s</span></div>
 </section></div></main></div>
 </body></html>`, marketName, price)
 }

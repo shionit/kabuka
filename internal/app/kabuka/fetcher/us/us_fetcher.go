@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	selectorCurrentPrice = "#root > main > div > section > div.PriceBoard__main__1liM > div.PriceBoard__priceInformation__78Tl > div.PriceBoard__priceBlock__1PmX > span > span > span"
+	selectorCurrentPrice = "[class*='StyledNumber__value']"
 )
 
 var (
@@ -33,7 +33,7 @@ func (f *usFetcher) IsMarket(doc *goquery.Document) bool {
 }
 
 func (f *usFetcher) Fetch(doc *goquery.Document, symbol string) (*model.Stock, error) {
-	curPrice := doc.Find(selectorCurrentPrice).Text()
+	curPrice := doc.Find(selectorCurrentPrice).First().Text()
 
 	return &model.Stock{
 		Symbol:       symbol,
