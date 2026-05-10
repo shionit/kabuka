@@ -31,7 +31,7 @@ jobs:
         run: go mod download
 
       - name: staticcheck
-        uses: reviewdog/action-staticcheck@644e2b5d4685a886d1bab12f75b04d2410f3db7b # v1.9.1
+        uses: reviewdog/action-staticcheck@50f9bfcf3738839ddc95deac241b904d77469096 # v1.28.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
