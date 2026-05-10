@@ -2,26 +2,46 @@ name: GoReleaser
 
 on:
   push:
+    # Trigger only on version tags (v*) to avoid accidental release triggers.
+    # Previously matched all tags (*); tightened to reduce attack surface.
     tags:
-      - '*'
+      - 'v*'
+
+# GoReleaser must create GitHub releases, so contents: write is required here.
+# All other workflows use read-only defaults.
+permissions:
+  contents: write
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Set up Go
-        uses: actions/setup-go@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
         with:
-          go-version: 1.22
-      -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          version: latest
+          # GoReleaser needs full git history to build the changelog.
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: '.go-version'
+
+      - name: Run GoReleaser
+        # Upgraded from v2 → v7.2.1. goreleaser-action v6+ requires the
+        # 'distribution' field; 'version: ~> v2' selects the latest GoReleaser
+        # v2.x release (backward-compatible with the existing .goreleaser.yml).
+        uses: goreleaser/goreleaser-action@1a80836c5c9d9e5755a25cb59ec6f45a3b5f41a8 # v7.2.1
+        with:
+          distribution: goreleaser
+          version: '~> v2'
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

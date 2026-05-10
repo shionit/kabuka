@@ -1,6 +1,19 @@
 version: 2
 updates:
+  # Go modules — weekly updates.
   - package-ecosystem: gomod
     directory: "/"
+    schedule:
+      interval: weekly
+
+  # GitHub Actions — weekly updates (digest-pinned by Renovate when running).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+
+  # Docker — tracks the devcontainer base image.
+  - package-ecosystem: docker
+    directory: "/.devcontainer"
     schedule:
       interval: weekly
