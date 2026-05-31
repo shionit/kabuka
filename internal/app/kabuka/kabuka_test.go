@@ -2,8 +2,10 @@ package kabuka
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
@@ -97,6 +99,220 @@ func TestKabuka_fetch_unit(t *testing.T) {
 	}
 }
 
+func TestParseOutputFormat(t *testing.T) {
+	tests := []struct {
+		input   string
+		want    OutputFormatType
+		wantErr bool
+	}{
+		{"text", OutputFormatTypeText, false},
+		{"", OutputFormatTypeText, false},
+		{"json", OutputFormatTypeJson, false},
+		{"csv", OutputFormatTypeCsv, false},
+		{"xml", "", true},
+		{"JSON", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got, err := ParseOutputFormat(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseOutputFormat(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ParseOutputFormat(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFindProductLinkFromSearchResults(t *testing.T) {
+	tests := []struct {
+		name    string
+		symbol  string
+		html    string
+		want    string
+		wantErr bool
+	}{
+		{
+			name:   "matching link found",
+			symbol: "3994.T",
+			html:   `<html><body><a href="https://finance.yahoo.co.jp/quote/3994.T">MoneyForward</a></body></html>`,
+			want:   "https://finance.yahoo.co.jp/quote/3994.T",
+		},
+		{
+			name:    "link for different symbol does not match",
+			symbol:  "3994.T",
+			html:    `<html><body><a href="https://finance.yahoo.co.jp/quote/7203.T">Toyota</a></body></html>`,
+			wantErr: true,
+		},
+		{
+			name:    "no links in document",
+			symbol:  "3994.T",
+			html:    `<html><body></body></html>`,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := &http.Response{
+				Body: io.NopCloser(strings.NewReader(tt.html)),
+			}
+			got, err := findProductLinkFromSearchResults(res, tt.symbol, "https://finance.yahoo.co.jp/quote/")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("findProductLinkFromSearchResults() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("findProductLinkFromSearchResults() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestKabuka_fetch_searchResultsPage(t *testing.T) {
+	symbol := "3994.T"
+
+	var srvURL string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/quote/"+symbol {
+			if _, err := fmt.Fprint(w, jpStockHTML("東証PRM", "4208")); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
+		} else {
+			// Return search results HTML with a link — no redirect so isSearchResultsPage returns true
+			if _, err := fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
+		}
+	}))
+	defer srv.Close()
+	srvURL = srv.URL
+
+	k := &Kabuka{
+		Option:       Option{Symbol: symbol},
+		baseURL:      srv.URL + "/search/?query=",
+		quoteBaseURL: srv.URL + "/quote/",
+	}
+	got, err := k.fetch()
+	if err != nil {
+		t.Fatalf("fetch() unexpected error: %v", err)
+	}
+	if got.CurrentPrice != "4208" {
+		t.Errorf("CurrentPrice = %q, want %q", got.CurrentPrice, "4208")
+	}
+}
+
+func TestKabuka_fetch_searchResultsPage_noLink(t *testing.T) {
+	symbol := "3994.T"
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Search results page with no matching link
+		if _, err := fmt.Fprint(w, `<html><body><a href="https://finance.yahoo.co.jp/other">other</a></body></html>`); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
+	}))
+	defer srv.Close()
+
+	k := &Kabuka{
+		Option:       Option{Symbol: symbol},
+		baseURL:      srv.URL + "/search/?query=",
+		quoteBaseURL: srv.URL + "/quote/",
+	}
+	if _, err := k.fetch(); err == nil {
+		t.Error("fetch() expected error when no matching link found, got nil")
+	}
+}
+
+func TestKabuka_fetch_searchResultsPage_productError(t *testing.T) {
+	symbol := "3994.T"
+
+	var srvURL string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/quote/"+symbol {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			if _, err := fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
+		}
+	}))
+	defer srv.Close()
+	srvURL = srv.URL
+
+	k := &Kabuka{
+		Option:       Option{Symbol: symbol},
+		baseURL:      srv.URL + "/search/?query=",
+		quoteBaseURL: srv.URL + "/quote/",
+	}
+	if _, err := k.fetch(); err == nil {
+		t.Error("fetch() expected error when product page returns 404, got nil")
+	}
+}
+
+func TestKabuka_fetch_httpError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer srv.Close()
+
+	k := &Kabuka{
+		Option:  Option{Symbol: "3994.T"},
+		baseURL: srv.URL + "/search/?query=",
+	}
+	if _, err := k.fetch(); err == nil {
+		t.Error("fetch() expected error for HTTP 500, got nil")
+	}
+}
+
+func TestKabuka_fetch_networkError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	srv.Close() // closed immediately so the connection is refused
+
+	k := &Kabuka{
+		Option:  Option{Symbol: "3994.T"},
+		baseURL: srv.URL + "/search/?query=",
+	}
+	if _, err := k.fetch(); err == nil {
+		t.Error("fetch() expected error for closed server, got nil")
+	}
+}
+
+func TestKabuka_Execute_fetchError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer srv.Close()
+
+	k := &Kabuka{
+		Option:  Option{Symbol: "3994.T", Format: OutputFormatTypeText},
+		baseURL: srv.URL + "/search/?query=",
+	}
+	if err := k.Execute(); err == nil {
+		t.Error("Execute() expected error when fetch fails, got nil")
+	}
+}
+
+func TestKabuka_Execute(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/quote/3994.T" {
+			if _, err := fmt.Fprint(w, jpStockHTML("東証PRM", "4208")); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
+		} else {
+			http.Redirect(w, r, "/quote/3994.T", http.StatusFound)
+		}
+	}))
+	defer srv.Close()
+
+	k := &Kabuka{
+		Option:  Option{Symbol: "3994.T", Format: OutputFormatTypeText},
+		baseURL: srv.URL + "/search/?query=",
+	}
+	if err := k.Execute(); err != nil {
+		t.Errorf("Execute() unexpected error: %v", err)
+	}
+}
+
 func TestKabuka_formatOutput(t *testing.T) {
 	type fields struct {
 		Option Option
@@ -154,7 +370,41 @@ func TestKabuka_formatOutput(t *testing.T) {
 					CurrentPrice: "1234.56",
 				},
 			},
-			want: "symbol,current_price\n3994.T,1234.56\n",
+			want: "symbol,current_price,change,change_pct,open,high,low,volume\n3994.T,1234.56,,,,,,\n",
+		},
+		{
+			name: "detail text",
+			fields: fields{
+				Option: Option{
+					Format:     OutputFormatTypeText,
+					ShowDetail: true,
+				},
+			},
+			args: args{
+				stock: &model.Stock{
+					Symbol:       "3994.T",
+					CurrentPrice: "4208",
+					Change:       "+120",
+					ChangePct:    "+2.93%",
+					Open:         "4100",
+					High:         "4250",
+					Low:          "4080",
+					Volume:       "341200",
+				},
+			},
+			want: "3994.T\t4208\t+120\t+2.93%\t4100\t4250\t4080\t341200",
+		},
+		{
+			name: "unknown format returns error",
+			fields: fields{
+				Option: Option{
+					Format: "xml",
+				},
+			},
+			args: args{
+				stock: &model.Stock{Symbol: "3994.T", CurrentPrice: "100"},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

@@ -33,6 +33,7 @@ import (
 
 var (
 	format string
+	detail bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -49,8 +50,9 @@ var rootCmd = &cobra.Command{
 		// Ticker like "3994.T"
 		symbol := cmd.Flags().Arg(0)
 		options := kabuka.Option{
-			Symbol: kabuka.SanitizeInput(symbol),
-			Format: f,
+			Symbol:     kabuka.SanitizeInput(symbol),
+			ShowDetail: detail,
+			Format:     f,
 		}
 		kabuka := &kabuka.Kabuka{
 			Option: options,
@@ -72,4 +74,6 @@ func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kabuka.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&format, "format", "f", "text",
 		"Output format. text or json or csv")
+	rootCmd.PersistentFlags().BoolVarP(&detail, "detail", "d", false,
+		"Output detailed stock information (change, open, high, low, volume)")
 }

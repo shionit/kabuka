@@ -55,6 +55,13 @@ New market support is added by:
 - `SanitizeInput()` strips newlines/carriage returns from user-supplied symbols
 - `FormatPrice()` strips commas before returning numeric price strings
 
+## Testing Standards
+
+- **Minimum coverage: 80%** per package (excluding `cmd/` and `main`, which are CLI wiring)
+- Run `go test -cover ./...` to check; packages below 80% must be brought up before merging
+- Unit tests must not require network access — use `httptest.NewServer` for HTTP-dependent code
+- Integration tests (build tag `integration`) are excluded from the coverage requirement
+
 ## Gotchas
 
 - **CSS selector fragility**: All fetchers (`fetcher/jp/`, `fetcher/us/`) hardcode deep CSS selectors against Yahoo Finance's DOM. When fetching silently breaks, inspect `selectorCurrentPrice` and `selectorMarketNameSingle` against the current live page first — Yahoo Finance HTML changes will cascade to all fetchers at once.
