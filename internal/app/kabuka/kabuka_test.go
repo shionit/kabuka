@@ -176,10 +176,14 @@ func TestKabuka_fetch_searchResultsPage(t *testing.T) {
 	var srvURL string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/quote/"+symbol {
-			fmt.Fprint(w, jpStockHTML("東証PRM", "4208"))
+			if _, err := fmt.Fprint(w, jpStockHTML("東証PRM", "4208")); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
 		} else {
 			// Return search results HTML with a link — no redirect so isSearchResultsPage returns true
-			fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol)
+			if _, err := fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
 		}
 	}))
 	defer srv.Close()
@@ -203,7 +207,9 @@ func TestKabuka_fetch_searchResultsPage_noLink(t *testing.T) {
 	symbol := "3994.T"
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Search results page with no matching link
-		fmt.Fprint(w, `<html><body><a href="https://finance.yahoo.co.jp/other">other</a></body></html>`)
+		if _, err := fmt.Fprint(w, `<html><body><a href="https://finance.yahoo.co.jp/other">other</a></body></html>`); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
 	}))
 	defer srv.Close()
 
@@ -225,7 +231,9 @@ func TestKabuka_fetch_searchResultsPage_productError(t *testing.T) {
 		if r.URL.Path == "/quote/"+symbol {
 			w.WriteHeader(http.StatusNotFound)
 		} else {
-			fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol)
+			if _, err := fmt.Fprintf(w, `<html><body><a href="%s/quote/%s">stock</a></body></html>`, srvURL, symbol); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
 		}
 	}))
 	defer srv.Close()
@@ -287,7 +295,9 @@ func TestKabuka_Execute_fetchError(t *testing.T) {
 func TestKabuka_Execute(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/quote/3994.T" {
-			fmt.Fprint(w, jpStockHTML("東証PRM", "4208"))
+			if _, err := fmt.Fprint(w, jpStockHTML("東証PRM", "4208")); err != nil {
+				t.Errorf("failed to write response: %v", err)
+			}
 		} else {
 			http.Redirect(w, r, "/quote/3994.T", http.StatusFound)
 		}
