@@ -32,11 +32,13 @@ func (f *usFetcher) IsMarket(doc *goquery.Document) bool {
 	return false
 }
 
-func (f *usFetcher) Fetch(doc *goquery.Document, symbol string) (*model.Stock, error) {
-	curPrice := doc.Find(selectorCurrentPrice).First().Text()
-
-	return &model.Stock{
+func (f *usFetcher) Fetch(doc *goquery.Document, symbol string, detail bool) (*model.Stock, error) {
+	stock := &model.Stock{
 		Symbol:       symbol,
-		CurrentPrice: fetcher.FormatPrice(curPrice),
-	}, nil
+		CurrentPrice: fetcher.FormatPrice(doc.Find(selectorCurrentPrice).First().Text()),
+	}
+	if detail {
+		fetcher.FetchDetailFields(doc, stock)
+	}
+	return stock, nil
 }

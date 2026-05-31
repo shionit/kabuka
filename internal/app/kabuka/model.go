@@ -9,18 +9,17 @@ import (
 
 // Option execution parameters
 type Option struct {
-	Symbol string
-	//ShowDetail        bool
-	Format OutputFormatType // text(default) or json or csv
-	//OutputColumnsType string // default, all, individual
-	//OutputColumns     []string
+	Symbol     string
+	ShowDetail bool
+	Format     OutputFormatType // text(default) or json or csv
 }
 
 type Kabuka struct {
 	Option
-	// httpClient and baseURL can be overridden in tests
-	httpClient *http.Client
-	baseURL    string
+	// httpClient, baseURL, and quoteBaseURL can be overridden in tests
+	httpClient   *http.Client
+	baseURL      string
+	quoteBaseURL string
 }
 
 type OutputFormatType string

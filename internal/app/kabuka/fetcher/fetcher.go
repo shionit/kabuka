@@ -9,8 +9,17 @@ import (
 )
 
 const (
-	selectorMarketNameSingle = "[class*='PriceBoardMenu__label']"
-	selectorMarketNameMulti  = "[class*='PriceBoardMenu__toggle']"
+	selectorMarketNameSingle    = "[class*='PriceBoardMenu__label']"
+	selectorMarketNameMulti     = "[class*='PriceBoardMenu__toggle']"
+	selectorChangeAbs           = "[class*='PriceChangeLabel__primary'] [class*='StyledNumber__value']"
+	selectorChangePct           = "[class*='PriceChangeLabel__secondary'] [class*='StyledNumber__value']"
+	selectorDataListItemTerm    = "[class*='DataListItem__term']"
+	selectorDataListItemName    = "[class*='DataListItem__name']"
+	selectorDataListItemValue   = "[class*='DataListItem__value']"
+	labelOpen                   = "始値"
+	labelHigh                   = "高値"
+	labelLow                    = "安値"
+	labelVolume                 = "出来高"
 )
 
 var (
@@ -21,7 +30,7 @@ type Fetcher interface {
 	// IsMarket returns whether the fetcher supports the document
 	IsMarket(doc *goquery.Document) bool
 	// Fetch parses the document and returns a parsed Stock model
-	Fetch(doc *goquery.Document, symbol string) (*model.Stock, error)
+	Fetch(doc *goquery.Document, symbol string, detail bool) (*model.Stock, error)
 }
 
 // RegisterFetcher registers a fetcher
@@ -51,4 +60,27 @@ func GetMarketName(doc *goquery.Document) string {
 		selection = doc.Find(selectorMarketNameMulti)
 	}
 	return selection.Text()
+}
+
+// FetchDetailFields fills detail fields on stock using selectors common to all markets.
+func FetchDetailFields(doc *goquery.Document, stock *model.Stock) {
+	stock.Change = doc.Find(selectorChangeAbs).First().Text()
+	if pct := doc.Find(selectorChangePct).First().Text(); pct != "" {
+		stock.ChangePct = pct + "%"
+	}
+	stock.Open = getDataListItemValue(doc, labelOpen)
+	stock.High = getDataListItemValue(doc, labelHigh)
+	stock.Low = getDataListItemValue(doc, labelLow)
+	stock.Volume = getDataListItemValue(doc, labelVolume)
+}
+
+// getDataListItemValue finds the value paired with the given label in a DataListItem.
+func getDataListItemValue(doc *goquery.Document, label string) string {
+	var value string
+	doc.Find(selectorDataListItemTerm).Each(func(_ int, dt *goquery.Selection) {
+		if strings.TrimSpace(dt.Find(selectorDataListItemName).Text()) == label {
+			value = FormatPrice(dt.Parent().Find(selectorDataListItemValue).First().Text())
+		}
+	})
+	return value
 }

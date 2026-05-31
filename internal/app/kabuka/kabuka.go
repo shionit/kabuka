@@ -61,7 +61,11 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 	// Check if we're on a search results page (multiple results)
 	if isSearchResultsPage(res, baseURL) {
 		// Try to find and follow the correct product link
-		productURL, err := findProductLinkFromSearchResults(res, k.Symbol)
+		quoteBaseURL := k.quoteBaseURL
+		if quoteBaseURL == "" {
+			quoteBaseURL = "https://finance.yahoo.co.jp/quote/"
+		}
+		productURL, err := findProductLinkFromSearchResults(res, k.Symbol, quoteBaseURL)
 		if err != nil {
 			return nil, xerrors.New("Symbol is not found.")
 		}
@@ -98,7 +102,7 @@ func (k *Kabuka) fetch() (*model.Stock, error) {
 	paths := strings.Split(res.Request.URL.Path, "/")
 	symbol := paths[len(paths)-1]
 	symbol = SanitizeInput(symbol)
-	return f.Fetch(doc, symbol)
+	return f.Fetch(doc, symbol, k.ShowDetail)
 }
 
 // isSearchResultsPage checks if the response is a search results page (multiple results)
@@ -109,26 +113,21 @@ func isSearchResultsPage(res *http.Response, baseURL string) bool {
 }
 
 // findProductLinkFromSearchResults extracts the correct product link from search results
-func findProductLinkFromSearchResults(res *http.Response, symbol string) (string, error) {
+func findProductLinkFromSearchResults(res *http.Response, symbol string, expectedPrefix string) (string, error) {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return "", xerrors.Errorf("Failed to parse search results page, err: %w", err)
 	}
 
-	// Look for links in the search results that match our symbol
-	// Yahoo Finance search results typically have links with the symbol in the href
 	var productURL string
-	expectedPrefix := "https://finance.yahoo.co.jp/quote/"
 
-	// Search for links that contain the symbol in their href attribute
 	doc.Find("a").Each(func(index int, item *goquery.Selection) {
 		href, exists := item.Attr("href")
 		if !exists {
 			return
 		}
 
-		// Check if this link starts with the expected prefix and ends with the symbol
-		if href == expectedPrefix + symbol {
+		if href == expectedPrefix+symbol {
 			productURL = href
 			return
 		}
@@ -147,7 +146,13 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 
 	switch k.Format {
 	case OutputFormatTypeText:
-		result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
+		if k.ShowDetail {
+			result = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				stock.Symbol, stock.CurrentPrice, stock.Change, stock.ChangePct,
+				stock.Open, stock.High, stock.Low, stock.Volume)
+		} else {
+			result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
+		}
 	case OutputFormatTypeJson:
 		b, err := json.Marshal(stock)
 		if err != nil {
