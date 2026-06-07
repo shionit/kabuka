@@ -5,5 +5,5 @@ test-integration:
 	go test -v -tags integration ./...
 
 test-coverage:
-	go test -v -tags integration -coverprofile=./gotest.profile ./... 2>&1
+	go test -v -coverprofile=./gotest.profile ./... 2>&1
 	go tool cover -html=./gotest.profile -o ./coverage.html
