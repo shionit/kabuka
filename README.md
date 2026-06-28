@@ -23,6 +23,17 @@ $ kabuka AAPL
 150.02	AAPL
 ```
 
+kabuka supports detailed output with the `-d` / `--detail` flag.
+```shell
+$ kabuka -d 3994.T
+symbol   price  change  change%   open   high   low    volume
+------   -----  ------  -------   ----   ----   ---    ------
+3994.T   4208   +120    +2.93%    4100   4250   4080   341200
+
+## same as
+$ kabuka --detail 3994.T
+```
+
 kabuka supports json format.
 ```shell
 $ kabuka 3994.T -f=json
