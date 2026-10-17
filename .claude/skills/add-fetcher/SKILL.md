@@ -24,7 +24,7 @@ Steps:
 
 5. Add a blank import in `internal/app/kabuka/kabuka.go`:
    ```go
-   _ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/<market>"
+   _ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/<market>"
    ```
 
 6. Add integration test cases to `kabuka_integration_test.go` covering at least one symbol from the new market.

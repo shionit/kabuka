@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/shionit/kabuka/cmd"
+import "github.com/shionit/kabuka/v2/cmd"
 
 func main() {
 	cmd.Execute()

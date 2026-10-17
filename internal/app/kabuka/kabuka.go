@@ -12,8 +12,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocarina/gocsv"
 	"github.com/goccy/go-json"
-	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 )
 
 const (

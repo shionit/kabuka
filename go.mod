@@ -1,4 +1,4 @@
-module github.com/shionit/kabuka
+module github.com/shionit/kabuka/v2
 
 go 1.25.9
 
