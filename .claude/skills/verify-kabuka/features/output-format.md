@@ -19,7 +19,7 @@ Preconditions:
 
 - Baseline from `README.md`: a built run and a healthy doctor.
 
-- **Explicit text.** Run `$H run "$RUN" format-text -- 3994.T -f=text`. Exit `0`. stdout is `<price>\t3994.T`, identical in shape to running without `-f`.
+- **Explicit text.** Run `$H run "$RUN" format-text -- 3994.T -f=text`. Exit `0`. stdout is `3994.T\t<price>`, identical in shape to running without `-f`.
 - **JSON.** Run `$H run "$RUN" format-json -- 3994.T -f=json`. Exit `0`. stdout parses as JSON (`jq -e . <file>`), equals `{"symbol":"3994.T","current_price":"<price>"}`, and has no detail keys.
 - **JSON, space-separated flag.** Run `$H run "$RUN" format-json-space -- 8604.T -f json`. Exit `0`. stdout is a JSON object with `"symbol":"8604.T"`.
 - **JSON, long flag.** Run `$H run "$RUN" format-json-long -- NMR --format=json`. Exit `0`. stdout is a JSON object with `"symbol":"NMR"`.
