@@ -27,6 +27,5 @@ Preconditions:
 
 ## Gotchas
 
-- The README shows a header row (`symbol price change ...`) for `-d`. The binary prints no header, only the data line. Trust the binary, and flag the README drift if relevant to the change.
 - In text mode, `-d` reorders output to symbol-first. Non-detail output is price-first. Don't reuse the non-detail parser.
 - Outside trading hours, open/high/low can be identical and volume tiny (seen: `6427.1 6427.1 6427.1 100`). That is real data, not a parsing bug.

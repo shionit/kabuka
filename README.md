@@ -24,11 +24,10 @@ $ kabuka AAPL
 ```
 
 kabuka supports detailed output with the `-d` / `--detail` flag.
+The columns are symbol, price, change, change%, open, high, low, and volume, separated by tabs.
 ```shell
 $ kabuka -d 3994.T
-symbol   price  change  change%   open   high   low    volume
-------   -----  ------  -------   ----   ----   ---    ------
-3994.T   4208   +120    +2.93%    4100   4250   4080   341200
+3994.T	4208	+120	+2.93%	4100	4250	4080	341200
 
 ## same as
 $ kabuka --detail 3994.T
