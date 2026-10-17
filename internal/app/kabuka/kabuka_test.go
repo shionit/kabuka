@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/jp"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/us"
 
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 )
 
 // jpStockHTML returns minimal HTML that satisfies the JP fetcher's CSS selectors.
@@ -340,7 +340,7 @@ func TestKabuka_formatOutput(t *testing.T) {
 					CurrentPrice: "123.45",
 				},
 			},
-			want: "123.45\t3994.T",
+			want: "3994.T\t123.45",
 		},
 		{
 			name: "nomal json",
@@ -370,7 +370,29 @@ func TestKabuka_formatOutput(t *testing.T) {
 					CurrentPrice: "1234.56",
 				},
 			},
-			want: "symbol,current_price,change,change_pct,open,high,low,volume\n3994.T,1234.56,,,,,,\n",
+			want: "symbol,current_price\n3994.T,1234.56\n",
+		},
+		{
+			name: "detail csv",
+			fields: fields{
+				Option: Option{
+					Format:     OutputFormatTypeCsv,
+					ShowDetail: true,
+				},
+			},
+			args: args{
+				stock: &model.Stock{
+					Symbol:       "3994.T",
+					CurrentPrice: "4208",
+					Change:       "+120",
+					ChangePct:    "+2.93%",
+					Open:         "4100",
+					High:         "4250",
+					Low:          "4080",
+					Volume:       "341200",
+				},
+			},
+			want: "symbol,current_price,change,change_pct,open,high,low,volume\n3994.T,4208,+120,+2.93%,4100,4250,4080,341200\n",
 		},
 		{
 			name: "detail text",

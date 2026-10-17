@@ -1,3 +1,4 @@
+version: 2
 project_name: kabuka
 before:
   hooks:
@@ -19,6 +20,6 @@ builds:
       - amd64
 archives:
   - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: tar.gz
+    formats: [tar.gz]
 checksum:
   name_template: 'checksums.txt'

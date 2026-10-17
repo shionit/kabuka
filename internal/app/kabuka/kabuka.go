@@ -12,8 +12,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocarina/gocsv"
 	"github.com/goccy/go-json"
-	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 )
 
 const (
@@ -140,6 +140,11 @@ func findProductLinkFromSearchResults(res *http.Response, symbol string, expecte
 	return productURL, nil
 }
 
+type stockSummary struct {
+	Symbol       string `csv:"symbol"`
+	CurrentPrice string `csv:"current_price"`
+}
+
 // formatOutput format output string.
 func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 	var result string
@@ -151,7 +156,7 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 				stock.Symbol, stock.CurrentPrice, stock.Change, stock.ChangePct,
 				stock.Open, stock.High, stock.Low, stock.Volume)
 		} else {
-			result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
+			result = fmt.Sprintf("%s\t%s", stock.Symbol, stock.CurrentPrice)
 		}
 	case OutputFormatTypeJson:
 		b, err := json.Marshal(stock)
@@ -160,8 +165,11 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 		}
 		result = string(b)
 	case OutputFormatTypeCsv:
-		stocks := []*model.Stock{stock}
-		csvContent, err := gocsv.MarshalString(&stocks)
+		var rows any = []*model.Stock{stock}
+		if !k.ShowDetail {
+			rows = []stockSummary{{Symbol: stock.Symbol, CurrentPrice: stock.CurrentPrice}}
+		}
+		csvContent, err := gocsv.MarshalString(rows)
 		if err != nil {
 			return "", xerrors.Errorf("csv Marshal failed, err: %w", err)
 		}

@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"testing"
 
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/jp"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/us"
 
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 
 	"github.com/google/go-cmp/cmp"
 )

@@ -11,24 +11,23 @@ kabuka is command line tool for display stock price.
 Show Japanese market stock price.
 ```shell
 $ kabuka 3994.T
-8090	3994.T
+3994.T	8090
 
 $ kabuka 4373
-2782	4373.T
+4373.T	2782
 ```
 
 Also show US market stock price.
 ```shell
 $ kabuka AAPL
-150.02	AAPL
+AAPL	150.02
 ```
 
 kabuka supports detailed output with the `-d` / `--detail` flag.
+The columns are symbol, price, change, change%, open, high, low, and volume, separated by tabs.
 ```shell
 $ kabuka -d 3994.T
-symbol   price  change  change%   open   high   low    volume
-------   -----  ------  -------   ----   ----   ---    ------
-3994.T   4208   +120    +2.93%    4100   4250   4080   341200
+3994.T	4208	+120	+2.93%	4100	4250	4080	341200
 
 ## same as
 $ kabuka --detail 3994.T

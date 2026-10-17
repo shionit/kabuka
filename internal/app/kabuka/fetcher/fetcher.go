@@ -3,7 +3,7 @@ package fetcher
 import (
 	"strings"
 
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 
 	"github.com/PuerkitoBio/goquery"
 )
