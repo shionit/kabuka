@@ -340,7 +340,7 @@ func TestKabuka_formatOutput(t *testing.T) {
 					CurrentPrice: "123.45",
 				},
 			},
-			want: "123.45\t3994.T",
+			want: "3994.T\t123.45",
 		},
 		{
 			name: "nomal json",

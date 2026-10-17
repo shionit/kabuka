@@ -156,7 +156,7 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 				stock.Symbol, stock.CurrentPrice, stock.Change, stock.ChangePct,
 				stock.Open, stock.High, stock.Low, stock.Volume)
 		} else {
-			result = fmt.Sprintf("%s\t%s", stock.CurrentPrice, stock.Symbol)
+			result = fmt.Sprintf("%s\t%s", stock.Symbol, stock.CurrentPrice)
 		}
 	case OutputFormatTypeJson:
 		b, err := json.Marshal(stock)

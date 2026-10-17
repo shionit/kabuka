@@ -27,5 +27,4 @@ Preconditions:
 
 ## Gotchas
 
-- In text mode, `-d` reorders output to symbol-first. Non-detail output is price-first. Don't reuse the non-detail parser.
 - Outside trading hours, open/high/low can be identical and volume tiny (seen: `6427.1 6427.1 6427.1 100`). That is real data, not a parsing bug.
