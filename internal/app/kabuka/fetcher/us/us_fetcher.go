@@ -2,8 +2,8 @@ package us
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"github.com/shionit/kabuka/internal/app/kabuka/fetcher"
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 )
 
 const (

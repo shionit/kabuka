@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/jp"
-	_ "github.com/shionit/kabuka/internal/app/kabuka/fetcher/us"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/jp"
+	_ "github.com/shionit/kabuka/v2/internal/app/kabuka/fetcher/us"
 
-	"github.com/shionit/kabuka/internal/app/kabuka/model"
+	"github.com/shionit/kabuka/v2/internal/app/kabuka/model"
 )
 
 // jpStockHTML returns minimal HTML that satisfies the JP fetcher's CSS selectors.
