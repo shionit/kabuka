@@ -140,6 +140,11 @@ func findProductLinkFromSearchResults(res *http.Response, symbol string, expecte
 	return productURL, nil
 }
 
+type stockSummary struct {
+	Symbol       string `csv:"symbol"`
+	CurrentPrice string `csv:"current_price"`
+}
+
 // formatOutput format output string.
 func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 	var result string
@@ -160,8 +165,11 @@ func (k *Kabuka) formatOutput(stock *model.Stock) (string, error) {
 		}
 		result = string(b)
 	case OutputFormatTypeCsv:
-		stocks := []*model.Stock{stock}
-		csvContent, err := gocsv.MarshalString(&stocks)
+		var rows any = []*model.Stock{stock}
+		if !k.ShowDetail {
+			rows = []stockSummary{{Symbol: stock.Symbol, CurrentPrice: stock.CurrentPrice}}
+		}
+		csvContent, err := gocsv.MarshalString(rows)
 		if err != nil {
 			return "", xerrors.Errorf("csv Marshal failed, err: %w", err)
 		}

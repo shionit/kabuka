@@ -370,7 +370,29 @@ func TestKabuka_formatOutput(t *testing.T) {
 					CurrentPrice: "1234.56",
 				},
 			},
-			want: "symbol,current_price,change,change_pct,open,high,low,volume\n3994.T,1234.56,,,,,,\n",
+			want: "symbol,current_price\n3994.T,1234.56\n",
+		},
+		{
+			name: "detail csv",
+			fields: fields{
+				Option: Option{
+					Format:     OutputFormatTypeCsv,
+					ShowDetail: true,
+				},
+			},
+			args: args{
+				stock: &model.Stock{
+					Symbol:       "3994.T",
+					CurrentPrice: "4208",
+					Change:       "+120",
+					ChangePct:    "+2.93%",
+					Open:         "4100",
+					High:         "4250",
+					Low:          "4080",
+					Volume:       "341200",
+				},
+			},
+			want: "symbol,current_price,change,change_pct,open,high,low,volume\n3994.T,4208,+120,+2.93%,4100,4250,4080,341200\n",
 		},
 		{
 			name: "detail text",
