@@ -16,6 +16,10 @@
   "prHourlyLimit": 2,
   "rebaseWhen": "behind-base-branch",
   "osvVulnerabilityAlerts": true,
+  "minimumReleaseAge": "3 days",
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": "3 days"
+  },
   "packageRules": [
     {
       "description": "Automerge low-risk updates: patch, pin, digest, and pinDigest. A 3-day minimum release age catches yanked releases.",
