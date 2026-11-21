@@ -8,7 +8,7 @@ require (
 	github.com/goccy/go-json v0.12.0
 	github.com/google/go-cmp v0.7.0
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
 )
 
 require (
